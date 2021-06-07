@@ -13,17 +13,17 @@ namespace cactus.DataAccess.Models
         [Required]
         public char category { get; set; }
 
-        [Required]
-        public int user_id { get; set; }
+       
+        public int? user_id { get; set; }
 
-        [Required]
-        public int book_id { get; set; }
+        
+        public int? book_id { get; set; }
 
-        [Required]
-        public int music_id { get; set; }
+        
+        public int? music_id { get; set; }
 
-        [Required]
-        public int movie_id { get; set; }
+      
+        public int? movie_id { get; set; }
 
         [Required]
         public bool status { get; set; }
@@ -35,6 +35,6 @@ namespace cactus.DataAccess.Models
         public int point { get; set; }
 
         [Required]
-        public DateTime editDate { get; set; }
+        public DateTime editdate { get; set; }
     }
 }
