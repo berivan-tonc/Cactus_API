@@ -41,5 +41,33 @@ namespace cactus.DataAccess.Services
             }
         }
 
+        public async Task<List<User>> GetFollowedUsersList(int UserId)
+        {
+            using (var dbContext = new cactusDbContext())
+            {
+                var posts = await (from u in dbContext.Users
+                                   join f in dbContext.Follows on u.id equals f.following_id
+                                   where f.followied_id == UserId
+                                   select u).ToListAsync();
+
+                return posts.OrderBy(x => x.firstname).ToList();
+
+            }
+        }
+
+        public async Task<List<User>> GetFollowingUsersList(int UserId)
+        {
+            using (var dbContext = new cactusDbContext())
+            {
+                var posts = await (from u in dbContext.Users
+                                   join f in dbContext.Follows on u.id equals f.followied_id
+                                   where f.following_id == UserId
+                                   select u).ToListAsync();
+
+                return posts.OrderBy(x => x.firstname).ToList();
+
+            }
+        }
+
     }
 }

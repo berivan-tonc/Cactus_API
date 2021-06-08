@@ -39,5 +39,21 @@ namespace cactus.Controllers
         {
             return await _userService.CreateUser(user);
         }
+
+        [HttpGet]
+        [Route("getbyFollowedId")]
+        public async Task<List<User>> GetFollowedUserList(int id)
+        {
+            return  await _userService.GetFollowedUsersList(id);
+           
+        }
+
+        [HttpGet]
+        [Route("getbyFollowingId")]
+        public async Task<List<User>> GetFollowingUserList(int id)
+        {
+            return await _userService.GetFollowingUsersList(id);
+           
+        }
     }
 }
