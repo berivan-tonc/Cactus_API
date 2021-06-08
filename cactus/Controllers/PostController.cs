@@ -33,12 +33,21 @@ namespace cactus.Controllers
             return book;
         }
 
-        //Kullanıcının kendi attığı tweet listesi
+        //Kullanıcının kendi attığı post listesi
         [HttpGet]
         [Route("getbyUserId")] 
         public async Task<List<Post>> GetUserPosts(int id)
         {
             var posts = await _postService.GetUserPosts(id);
+            return posts;
+        }
+
+        //Kullanıcının takip ettiği kullanıcıların attığı post listesi
+        [HttpGet]
+        [Route("getbyFollowedId")]
+        public async Task<List<Post>> GetFollowedPosts(int id)
+        {
+            var posts = await _postService.GetFollowedPosts(id);
             return posts;
         }
 

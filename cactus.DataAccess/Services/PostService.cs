@@ -17,6 +17,7 @@ namespace cactus.DataAccess.Services
                 return await dbContext.Posts.ToListAsync();
             }
         }
+
         public async Task<Post> GetPostById(int PostId)
         {
             using (var dbContext = new cactusDbContext())
@@ -63,6 +64,18 @@ namespace cactus.DataAccess.Services
             }
         }
 
+        public async Task<List<Post>> GetFollowedPosts(int UserId)
+        {
+            using (var dbContext = new cactusDbContext())
+            {
+                var posts = await (from p in dbContext.Posts
+                              join f in dbContext.Follows on p.user_id equals f.followied_id
+                              where f.following_id == UserId
+                              select p).ToListAsync();
 
+                return posts.OrderBy(x => x.editdate).ToList();
+
+            }
+        }
     }
 }
