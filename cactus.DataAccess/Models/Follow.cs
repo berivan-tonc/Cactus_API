@@ -14,7 +14,7 @@ namespace cactus.DataAccess.Models
         public int following_id { get; set; }
 
         [Required]
-        public int followied_id { get; set; }
+        public int followed_id { get; set; }
 
     }
 }

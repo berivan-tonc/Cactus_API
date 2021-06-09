@@ -40,14 +40,22 @@ namespace cactus.DataAccess.Services
                 return user;
             }
         }
-
+        public async Task<User> UpdateUser(User user)
+        {
+            using (var dbContext = new cactusDbContext())
+            {
+                dbContext.Users.Update(user);
+                await dbContext.SaveChangesAsync();
+                return user;
+            }
+        }
         public async Task<List<User>> GetFollowedUsersList(int UserId)
         {
             using (var dbContext = new cactusDbContext())
             {
                 var posts = await (from u in dbContext.Users
                                    join f in dbContext.Follows on u.id equals f.following_id
-                                   where f.followied_id == UserId
+                                   where f.followed_id == UserId
                                    select u).ToListAsync();
 
                 return posts.OrderBy(x => x.firstname).ToList();
@@ -60,7 +68,7 @@ namespace cactus.DataAccess.Services
             using (var dbContext = new cactusDbContext())
             {
                 var posts = await (from u in dbContext.Users
-                                   join f in dbContext.Follows on u.id equals f.followied_id
+                                   join f in dbContext.Follows on u.id equals f.followed_id
                                    where f.following_id == UserId
                                    select u).ToListAsync();
 
