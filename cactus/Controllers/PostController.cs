@@ -64,7 +64,6 @@ namespace cactus.Controllers
             return await _postService.UpdatePost(post);
         }
 
-        [Route("deletebyId")]
         [HttpDelete]
         public void Delete(int id)
         {

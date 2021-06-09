@@ -13,8 +13,8 @@ namespace cactus.DataAccess.Models
         [Required]
         public char category { get; set; }
 
-       
-        public int? user_id { get; set; }
+        [Required]
+        public int user_id { get; set; }
 
         
         public int? book_id { get; set; }
