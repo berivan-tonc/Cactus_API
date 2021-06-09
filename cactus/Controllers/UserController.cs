@@ -34,6 +34,12 @@ namespace cactus.Controllers
             return user;
         }
 
+        [HttpPut]
+        public async Task<User> Put([FromBody] User user)
+        {
+            return await _userService.UpdateUser(user);
+        }
+
         [HttpPost]
         public async Task<User> Post([FromBody] User user)
         {

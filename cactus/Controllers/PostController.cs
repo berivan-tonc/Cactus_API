@@ -51,6 +51,14 @@ namespace cactus.Controllers
             return posts;
         }
 
+        [HttpGet]
+        [Route("search")]
+        public async Task<List<Post>> Search(int cat, int itemId)
+        {
+            var posts = await _postService.Search(cat, itemId);
+            return posts;
+        }
+
         [HttpPost]
         public async Task<Post> Post([FromBody] Post post)
         {
@@ -65,9 +73,9 @@ namespace cactus.Controllers
         }
 
         [HttpDelete]
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-             _postService.DeletePost(id);
+            await _postService.DeletePost(id);
         }
     }
 }
