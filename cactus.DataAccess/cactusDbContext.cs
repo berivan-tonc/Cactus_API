@@ -18,5 +18,7 @@ namespace cactus.DataAccess
         public DbSet<Book> Books { get; set; }
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Music> Music { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Follow> Follows { get; set; }
     }
 }
