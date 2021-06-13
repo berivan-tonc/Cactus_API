@@ -45,7 +45,8 @@ namespace cactus.DataAccess.Services
         {
             using (var dbContext = new cactusDbContext())
             {
-                return await dbContext.Posts.Where(u => u.user_id == UserId).ToListAsync();
+                var posts = await dbContext.Posts.Where(u => u.user_id == UserId).ToListAsync();
+                return posts.OrderBy(x => x.editdate).Reverse().ToList();
             }
         }
 
@@ -88,7 +89,7 @@ namespace cactus.DataAccess.Services
                               where f.following_id == UserId
                               select p).ToListAsync();
 
-                return posts.OrderBy(x => x.editdate).ToList();
+                return posts.OrderBy(x => x.editdate).Reverse().ToList();
 
             }
         }
