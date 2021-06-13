@@ -19,8 +19,8 @@ namespace cactus.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<Follow> Control(int userId, char cntrlId)
+        [HttpGet("{userId}/{cntrlId}")]
+        public async Task<Follow> Control(int userId, int cntrlId)
         {
             var evnt = await _followService.Control(userId, cntrlId);
             return evnt;
@@ -32,7 +32,7 @@ namespace cactus.Controllers
             return await _followService.CreateFollow(follow);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task Delete(int id)
         {
             await _followService.DeleteFollow(id);
