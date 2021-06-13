@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using cactus.DataAccess.DTO;
 using cactus.DataAccess.Models;
 using cactus.DataAccess.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ namespace cactus.Controllers
         //Kullanıcının kendi attığı post listesi
         [HttpGet]
         [Route("getbyUserId")] 
-        public async Task<List<Post>> GetUserPosts(int id)
+        public async Task<List<PostDTO>> GetUserPosts(int id)
         {
             var posts = await _postService.GetUserPosts(id);
             return posts;
@@ -45,7 +46,7 @@ namespace cactus.Controllers
         //Kullanıcının takip ettiği kullanıcıların attığı post listesi
         [HttpGet]
         [Route("getbyFollowedId")]
-        public async Task<List<Post>> GetFollowedPosts(int id)
+        public async Task<List<PostDTO>> GetFollowedPosts(int id)
         {
             var posts = await _postService.GetFollowedPosts(id);
             return posts;
@@ -53,7 +54,7 @@ namespace cactus.Controllers
 
         [HttpGet]
         [Route("search")]
-        public async Task<List<Post>> Search(int cat, int itemId)
+        public async Task<List<PostDTO>> Search(char cat, int itemId)
         {
             var posts = await _postService.Search(cat, itemId);
             return posts;
