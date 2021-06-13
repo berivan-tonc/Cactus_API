@@ -58,7 +58,7 @@ namespace cactus.DataAccess.Services
                                    where f.followed_id == UserId
                                    select u).ToListAsync();
 
-                return posts.OrderBy(x => x.firstname).ToList();
+                return posts.OrderBy(x => x.firstname).Reverse().ToList();
 
             }
         }
@@ -72,7 +72,7 @@ namespace cactus.DataAccess.Services
                                    where f.following_id == UserId
                                    select u).ToListAsync();
 
-                return posts.OrderBy(x => x.firstname).ToList();
+                return posts.OrderBy(x => x.firstname).Reverse().ToList();
 
             }
         }
