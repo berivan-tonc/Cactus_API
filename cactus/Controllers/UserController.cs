@@ -34,6 +34,14 @@ namespace cactus.Controllers
             return Ok(user);
         }
 
+        [AllowAnonymous]
+        [Route("register")]
+        [HttpPost]
+        public async Task<User> Post([FromBody] User user)
+        {
+            return await _userService.CreateUser(user);
+        }
+
         [HttpGet]
         public async Task<List<User>> Get()
         {
@@ -54,12 +62,6 @@ namespace cactus.Controllers
             return await _userService.UpdateUser(user);
         }
 
-        [AllowAnonymous]
-        [HttpPost]
-        public async Task<User> Post([FromBody] User user)
-        {
-            return await _userService.CreateUser(user);
-        }
 
         [HttpGet]
         [Route("getbyFollowedId")]
