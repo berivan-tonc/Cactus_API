@@ -1,4 +1,5 @@
-﻿using cactus.DataAccess.Models;
+﻿using cactus.DataAccess.DTO;
+using cactus.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,18 +19,23 @@ namespace cactus.DataAccess.Services
             }
         }
 
-        public async Task<List<Post>> Search(int cat, int itemId)
+        public async Task<List<PostDTO>> Search(char cat, int itemId)
         {
             using (var dbContext = new cactusDbContext())
             {
                 var posts = await (from p in dbContext.Posts
-                                   join b in dbContext.Books on  p.book_id equals b.id
-                                   join mv in dbContext.Movies on p.movie_id equals mv.id
-                                   join ms in dbContext.Music on p.music_id equals ms.id
-                                   where p.status == true && p.category == cat && (p.book_id != null && p.book_id == itemId) || (p.movie_id != null && p.movie_id == itemId) || (p.music_id != null && p.music_id == itemId)
-                                   select p).ToListAsync();
+                                   join u in dbContext.Users on p.user_id equals u.id
+                                   join b in dbContext.Books on new { Book = p.book_id } equals new { Book = (int?)b.id } into btemp
+                                   from bk in btemp.DefaultIfEmpty()
+                                   join mv in dbContext.Movies on new { Movie = p.movie_id } equals new { Movie = (int?)mv.id } into motemp
+                                   from mov in motemp.DefaultIfEmpty()
+                                   join mu in dbContext.Music on new { Music = p.music_id } equals new { Music = (int?)mu.id } into mutemp
+                                   from mus in mutemp.DefaultIfEmpty()
+                                   where (p.status == true) && (p.category == cat) && ((p.book_id != null && p.book_id == itemId) || (p.movie_id != null && p.movie_id == itemId) || (p.music_id != null && p.music_id == itemId))
+                                   select new PostDTO { post=p,music=mus,book= bk, movie=mov, user=u}).ToListAsync();
 
-                return posts.OrderBy(x => x.editdate).ToList();
+
+                return posts.OrderBy(x => x.post.editdate).Reverse().ToList();
             }
         }
 
@@ -41,12 +47,23 @@ namespace cactus.DataAccess.Services
             }
         }
 
-        public async Task<List<Post>> GetUserPosts(int UserId)
+        public async Task<List<PostDTO>> GetUserPosts(int UserId)
         {
             using (var dbContext = new cactusDbContext())
             {
-                var posts = await dbContext.Posts.Where(u => u.user_id == UserId).ToListAsync();
-                return posts.OrderBy(x => x.editdate).Reverse().ToList();
+                var posts = await (from p in dbContext.Posts
+                                   join u in dbContext.Users on p.user_id equals u.id
+                                   join b in dbContext.Books on new { Book = p.book_id } equals new { Book = (int?)b.id } into btemp
+                                   from bk in btemp.DefaultIfEmpty()
+                                   join mv in dbContext.Movies on new { Movie = p.movie_id } equals new { Movie = (int?)mv.id } into motemp
+                                   from mov in motemp.DefaultIfEmpty()
+                                   join mu in dbContext.Music on new { Music = p.music_id } equals new { Music = (int?)mu.id } into mutemp
+                                   from mus in mutemp.DefaultIfEmpty()
+                                   where (p.status == true) && p.user_id == UserId
+                                   select new PostDTO { post = p, music = mus, book = bk, movie = mov, user = u }).ToListAsync();
+
+
+                return posts.OrderBy(x => x.post.editdate).Reverse().ToList();
             }
         }
 
@@ -80,16 +97,24 @@ namespace cactus.DataAccess.Services
             }
         }
 
-        public async Task<List<Post>> GetFollowedPosts(int UserId)
+        public async Task<List<PostDTO>> GetFollowedPosts(int UserId)
         {
             using (var dbContext = new cactusDbContext())
             {
                 var posts = await (from p in dbContext.Posts
-                              join f in dbContext.Follows on p.user_id equals f.followed_id
-                              where f.following_id == UserId
-                              select p).ToListAsync();
+                                   join u in dbContext.Users on p.user_id equals u.id
+                                   join b in dbContext.Books on new { Book = p.book_id } equals new { Book = (int?)b.id } into btemp
+                                   from bk in btemp.DefaultIfEmpty()
+                                   join mv in dbContext.Movies on new { Movie = p.movie_id } equals new { Movie = (int?)mv.id } into motemp
+                                   from mov in motemp.DefaultIfEmpty()
+                                   join mu in dbContext.Music on new { Music = p.music_id } equals new { Music = (int?)mu.id } into mutemp
+                                   from mus in mutemp.DefaultIfEmpty()
+                                   join f in dbContext.Follows on p.user_id equals f.followed_id
+                                   where (p.status == true) && f.following_id == UserId
+                                   select new PostDTO { post = p, music = mus, book = bk, movie = mov, user = u }).ToListAsync();
 
-                return posts.OrderBy(x => x.editdate).Reverse().ToList();
+
+                return posts.OrderBy(x => x.post.editdate).Reverse().ToList();
 
             }
         }

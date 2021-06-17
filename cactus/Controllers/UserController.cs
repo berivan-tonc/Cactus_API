@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace cactus.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
