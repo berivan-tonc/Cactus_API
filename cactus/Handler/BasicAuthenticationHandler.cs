@@ -10,6 +10,8 @@ using cactus.Controllers;
 using cactus.DataAccess.Models;
 using cactus.DataAccess.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -17,45 +19,55 @@ namespace cactus.Handler
 {
     public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
+     
+
         public BasicAuthenticationHandler(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
-            ISystemClock clock):
-            base(options, logger, encoder, clock)
-        { }
+            ISystemClock clock)
+            : base(options, logger, encoder, clock)
+        {
+        }
+
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            // skip authentication if endpoint has [AllowAnonymous] attribute
+            var endpoint = Context.GetEndpoint();
+            if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
+                return AuthenticateResult.NoResult();
+
             if (!Request.Headers.ContainsKey("Authorization"))
-                return AuthenticateResult.Fail("Authorization header was not found");
+                return AuthenticateResult.Fail("Missing Authorization Header");
+
+            User user = null;
             try
             {
-                var authenticationHeaderValue = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
-                var bytes = Convert.FromBase64String(authenticationHeaderValue.Parameter);
-                string[] credentials = Encoding.UTF8.GetString(bytes).Split(":");
-                string email = credentials[0];
-                string password = credentials[1];
-                UserService userService = new UserService();
-                User user = userService.GetUser(email, password);
-                if(user == null)
-                {
-                    return AuthenticateResult.Fail("Invalid Input");
-                }
-                else
-                {
-                    var claims = new[] { new Claim(ClaimTypes.Name, user.email) };
-                    var identity = new ClaimsIdentity(claims, Scheme.Name);
-                    var principal = new ClaimsPrincipal(identity);
-                    var ticket = new AuthenticationTicket(principal, Scheme.Name);
-                    return AuthenticateResult.Success(ticket);
-
-                }
+                var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
+                var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
+                var credentials = Encoding.UTF8.GetString(credentialBytes).Split(new[] { ':' }, 2);
+                var email = credentials[0];
+                var password = credentials[1];
+                AuthenticateService authenticate = new AuthenticateService();
+                user = await authenticate.Authenticate(email, password);
             }
-            catch(Exception)
+            catch
             {
-                return AuthenticateResult.Fail("Authenticate Error");
+                return AuthenticateResult.Fail("Invalid Authorization Header");
             }
 
+            if (user == null)
+                return AuthenticateResult.Fail("Invalid Username or Password");
+
+            var claims = new[] {
+                new Claim(ClaimTypes.NameIdentifier, user.id.ToString()),
+                new Claim(ClaimTypes.Name, user.email),
+            };
+            var identity = new ClaimsIdentity(claims, Scheme.Name);
+            var principal = new ClaimsPrincipal(identity);
+            var ticket = new AuthenticationTicket(principal, Scheme.Name);
+
+            return AuthenticateResult.Success(ticket);
         }
     }
 }

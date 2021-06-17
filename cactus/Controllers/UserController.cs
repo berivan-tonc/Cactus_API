@@ -9,14 +9,37 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace cactus.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {
         private UserService _userService;
+        private AuthenticateService _authenticateService;
         public UserController()
         {
             _userService = new UserService();
+            _authenticateService = new AuthenticateService();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("authenticate")]
+        public async Task<IActionResult> Authenticate([FromBody] AuthenticateModel model)
+        {
+            var user = await _authenticateService.Authenticate(model.email, model.password);
+
+            if (user == null)
+                return BadRequest(new { message = "Username or password is incorrect" });
+
+            return Ok(user);
+        }
+
+        [AllowAnonymous]
+        [Route("register")]
+        [HttpPost]
+        public async Task<User> Post([FromBody] User user)
+        {
+            return await _userService.CreateUser(user);
         }
 
         [HttpGet]
@@ -39,11 +62,6 @@ namespace cactus.Controllers
             return await _userService.UpdateUser(user);
         }
 
-        [HttpPost]
-        public async Task<User> Post([FromBody] User user)
-        {
-            return await _userService.CreateUser(user);
-        }
 
         [HttpGet]
         [Route("getbyFollowedId")]
