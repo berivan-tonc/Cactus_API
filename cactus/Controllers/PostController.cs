@@ -80,5 +80,12 @@ namespace cactus.Controllers
         {
             await _postService.DeletePost(id);
         }
+
+        [HttpGet]
+        [Route("explore")]
+        public async Task<List<string>> GetWeekTopTen(char cat)
+        {
+            return await _postService.GetMostSharedPosts(cat);
+        }
     }
 }

@@ -39,6 +39,52 @@ namespace cactus.DataAccess.Services
             }
         }
 
+
+        public async Task<List<string>> GetMostSharedPosts(char cat)
+        {
+            using (var dbContext = new cactusDbContext())
+            {
+                var dt = DateTime.Now.AddDays(-7);
+                if (cat=='b')
+                {
+                    var mostSharedPosts = await (from p in dbContext.Posts
+                                                 join b in dbContext.Books on p.book_id equals b.id
+                                                 where (p.status == true) && (p.category == cat) && (p.editdate > dt)
+                                                 group p by b.title into g
+                                                 orderby g.Count() descending
+                                                 select g.Key
+                                                 ).Take(10).ToListAsync();
+
+                    return mostSharedPosts;
+                }
+                else if (cat == 'm')
+                {
+                    var mostSharedPosts = await (from p in dbContext.Posts
+                                                 join m in dbContext.Music on p.music_id equals m.id
+                                                 where (p.status == true) && (p.category == cat) && (p.editdate > dt)
+                                                 group p by m.title into g
+                                                 orderby g.Count() descending
+                                                 select g.Key
+                                                 ).Take(10).ToListAsync();
+
+                    return mostSharedPosts;
+                }
+                else if (cat == 'f')
+                {
+                    var mostSharedPosts = await (from p in dbContext.Posts
+                                                 join f in dbContext.Movies on p.movie_id equals f.id
+                                                 where (p.status == true) && (p.category == cat) && (p.editdate > dt)
+                                                 group p by f.title into g
+                                                 orderby g.Count() descending
+                                                 select g.Key
+                                                 ).Take(10).ToListAsync();
+
+                    return mostSharedPosts;
+                }
+                return null;                
+            }
+        }
+
         public async Task<Post> GetPostById(int PostId)
         {
             using (var dbContext = new cactusDbContext())
