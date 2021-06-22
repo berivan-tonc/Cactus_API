@@ -65,6 +65,7 @@ namespace cactus.Controllers
         [HttpPost]
         public async Task<Post> Post([FromBody] Post post)
         {
+            post.editdate = DateTime.Now;
             return await _postService.CreatePost(post);
         }
 
