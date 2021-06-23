@@ -61,6 +61,13 @@ namespace cactus.Controllers
             var posts = await _postService.Search(cat, itemId);
             return posts;
         }
+        [HttpGet]
+        [Route("point")]
+        public double GetPoint(char cat, int itemId)
+        {
+            var point = _postService.GetPoint(cat, itemId);
+            return point;
+        }
 
         [HttpPost]
         public async Task<Post> Post([FromBody] Post post)

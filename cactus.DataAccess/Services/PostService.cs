@@ -142,6 +142,16 @@ namespace cactus.DataAccess.Services
                 return post;
             }
         }
+        public  double GetPoint(char cat, int itemId)
+        {
+            using (var dbContext = new cactusDbContext())
+            {
+                var point =  dbContext.Posts.Where(p => (p.status == true) && p.category == cat && ((p.book_id != null && p.book_id == itemId) || (p.movie_id != null && p.movie_id == itemId) || (p.music_id != null && p.music_id == itemId))).Select(p=>p.point).Average();
+
+                return point;
+
+            }
+        }
 
         public async Task<List<PostDTO>> GetFollowedPosts(int UserId)
         {
